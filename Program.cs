@@ -8,11 +8,11 @@ namespace Library_System
 {
     class Program
     {
+        public static char FILE_SPLITTER = ',';
         private static long _total = 0L;
         private static string _lastNodeAction = string.Empty;
         private const string CHECKOUT = "check-out";
         private const string CHECKIN = "check-in";
-        private const char FILE_SPLITTER = ',';
 
         static void Main(string[] args)
         {
@@ -29,38 +29,16 @@ namespace Library_System
             outputFileType = Console.ReadLine();
 
             /*------------------ reading input file ------------------*/
-            try
-            {
-                query = ReadInputFile(inputFilePath);
-            }
-            catch (Exception e)
-            {
-                if (e.Source != null)
-                {
-                    Console.WriteLine(Resource.exceptionsource, e.Source);
-                }
+            query = ReadInputFile(inputFilePath);
 
-                //Exist Program
-                Console.WriteLine("\n============== Ending Program ===============\n");
-                System.Environment.Exit(1);
-            }
 
             /*------------------ handle statistical operations ------------------*/
             var resultJson = HandleStatisticalData(query);
 
 
             /*------------------ write output results to file ------------------*/
-            try
-            {
-                HandelOutoutFile(resultJson, outputFileType);
-            }
-            catch (Exception e)
-            {
-                if (e.Source != null)
-                {
-                    Console.WriteLine(Resource.exceptionsource, e.Source);
-                }
-            }
+            HandelOutoutFile(resultJson, outputFileType);
+
 
             /*------------------ write output results to console ------------------*/
             Console.WriteLine("\n=============================\n");
@@ -73,28 +51,38 @@ namespace Library_System
         public static List<Record> ReadInputFile(string inputFilePath)
         {
             List<Record> query = new List<Record>();
-            if (!string.IsNullOrEmpty(inputFilePath))
+            try
             {
-                if (inputFilePath.EndsWith(".xml"))
+                if (!string.IsNullOrEmpty(inputFilePath))
                 {
-                    XElement root = XElement.Load(inputFilePath);
+                    if (inputFilePath.EndsWith(".xml"))
+                    {
+                        XElement root = XElement.Load(inputFilePath);
 
-                    query =
-                        (from el in root.Elements(nameof(Record).ToLower())
-                         select new Record(el.Element(nameof(Record.Person).ToLower()).Attribute("id").Value,
-                                    el.Element(nameof(Record.ISBN).ToLower()).Value,
-                                    (DateTimeOffset)el.Element(nameof(Record.Timestamp).ToLower()),
-                                    el.Element(nameof(Record.Action).ToLower()).Attribute("type").Value)).ToList();
+                        query =
+                            (from el in root.Elements(nameof(Record).ToLower())
+                             select new Record(el.Element(nameof(Record.Person).ToLower()).Attribute("id").Value,
+                                        el.Element(nameof(Record.ISBN).ToLower()).Value,
+                                        (DateTimeOffset)el.Element(nameof(Record.Timestamp).ToLower()),
+                                        el.Element(nameof(Record.Action).ToLower()).Attribute("type").Value)).ToList();
 
-                }
-                else if (inputFilePath.EndsWith(".csv"))
-                {
-                    query = File.ReadLines(inputFilePath)
-                                .Skip(1)
-                                .Where(s => s != string.Empty)
-                                .Select(s => s.Split(new[] { FILE_SPLITTER }))
-                                .Select(a => new Record(a[1], a[2], DateTimeOffset.Parse(a[0]), a[3]))
-                                .ToList();
+                    }
+                    else if (inputFilePath.EndsWith(".csv"))
+                    {
+                        query = File.ReadLines(inputFilePath)
+                                    .Skip(1)
+                                    .Where(s => s != string.Empty)
+                                    .Select(s => s.Split(new[] { FILE_SPLITTER }))
+                                    .Select(a => new Record(a[1], a[2], DateTimeOffset.Parse(a[0]), a[3]))
+                                    .ToList();
+                    }
+                    else
+                    {
+                        // Console app
+                        Console.WriteLine(Resource.wrongentry);
+                        Console.WriteLine("\n============== Ending Program ===============\n");
+                        System.Environment.Exit(1);
+                    }
                 }
                 else
                 {
@@ -104,10 +92,14 @@ namespace Library_System
                     System.Environment.Exit(1);
                 }
             }
-            else
+            catch (Exception e)
             {
-                // Console app
-                Console.WriteLine(Resource.wrongentry);
+                if (e.Source != null)
+                {
+                    Console.WriteLine(Resource.exceptionsource, e.Source);
+                }
+
+                //Exist Program
                 Console.WriteLine("\n============== Ending Program ===============\n");
                 System.Environment.Exit(1);
             }
@@ -208,21 +200,31 @@ namespace Library_System
 
         public static void HandelOutoutFile(Object resultJson, string outputFileType)
         {
-            var outputFileName = "output_" + DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss");
-
-            if (outputFileType == "J")
+            try
             {
-                outputFileName += ".json";
-            }
-            else
-            {
-                outputFileName += ".txt";
-            }
+                var outputFileName = "output_" + DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss");
 
-            File.WriteAllText(outputFileName, resultJson.ToString());
+                if (outputFileType == "J")
+                {
+                    outputFileName += ".json";
+                }
+                else
+                {
+                    outputFileName += ".txt";
+                }
+
+                File.WriteAllText(outputFileName, resultJson.ToString());
+            }
+            catch (Exception e)
+            {
+                if (e.Source != null)
+                {
+                    Console.WriteLine(Resource.exceptionsource, e.Source);
+                }
+            }
         }
 
-        public static long SumUpCheckoutTime(long current, Record next)
+        private static long SumUpCheckoutTime(long current, Record next)
         {
             long result = next.Ticks;
             _lastNodeAction = next.Action;
