@@ -33,17 +33,11 @@ namespace Library_System
 
 
             /*------------------ handle statistical operations ------------------*/
-            var resultJson = HandleStatisticalData(query);
+            Dictionary<string, string> resultJson = HandleStatisticalData(query);
 
 
             /*------------------ write output results to file ------------------*/
             HandelOutoutFile(resultJson, outputFileType);
-
-
-            /*------------------ write output results to console ------------------*/
-            Console.WriteLine("\n=============================\n");
-            Console.WriteLine(resultJson);
-            Console.WriteLine("\n=============================\n");
 
             Console.WriteLine("\n============== Ending Program ===============\n");
         }
@@ -107,7 +101,7 @@ namespace Library_System
             return query;
         }
 
-        public static object HandleStatisticalData(List<Record> query)
+        public static Dictionary<string, string> HandleStatisticalData(List<Record> query)
         {
             string personWithMostCheckouts = string.Empty;
             string mostCheckedOutBook = string.Empty;
@@ -187,18 +181,16 @@ namespace Library_System
             }
 
             /*Write to result obj*/
-            var resultJson = new
-            {
-                person_with_most_checkouts = personWithMostCheckouts,
-                most_checked_out_book = mostCheckedOutBook,
-                current_checked_out_book_count = currentCheckedOutBookCount,
-                person_who_has_currently_most_books = personHasCurrentlyMostBooks
-            };
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            result.Add("person_with_most_checkouts", personWithMostCheckouts);
+            result.Add("most_checked_out_book", mostCheckedOutBook);
+            result.Add("current_checked_out_book_count", currentCheckedOutBookCount);
+            result.Add("person_who_has_currently_most_books", personHasCurrentlyMostBooks);
 
-            return resultJson;
+            return result;
         }
 
-        public static void HandelOutoutFile(Object resultJson, string outputFileType)
+        public static void HandelOutoutFile(Dictionary<string, string> result, string outputFileType)
         {
             try
             {
@@ -207,13 +199,37 @@ namespace Library_System
                 if (outputFileType == "J")
                 {
                     outputFileName += ".json";
+                    var resultJson = new
+                    {
+                        person_with_most_checkouts = result["person_with_most_checkouts"],
+                        most_checked_out_book = result["most_checked_out_book"],
+                        current_checked_out_book_count = result["current_checked_out_book_count"],
+                        person_who_has_currently_most_books = result["person_who_has_currently_most_books"]
+                    };
+                    File.WriteAllText(outputFileName, resultJson.ToString());
+
+                    /*------------------ write output results to console ------------------*/
+                    Console.WriteLine("\n=============================\n");
+                    Console.WriteLine(resultJson);
+                    Console.WriteLine("\n=============================\n");
                 }
                 else
                 {
                     outputFileName += ".txt";
-                }
 
-                File.WriteAllText(outputFileName, resultJson.ToString());
+                    string[] lines = { string.Format(Resource.personwithmostcheckouts, result["person_with_most_checkouts"]),
+                        string.Format(Resource.most_checked_out_book, result["most_checked_out_book"]),
+                        string.Format(Resource.current_checked_out_book_count, result["current_checked_out_book_count"]),
+                        string.Format(Resource.person_who_has_currently_most_books, result["person_who_has_currently_most_books"])
+                    };
+
+                    File.WriteAllLines(outputFileName, lines);
+
+                    /*------------------ write output results to console ------------------*/
+                    Console.WriteLine("\n=============================\n");
+                    Array.ForEach(lines, Console.WriteLine);
+                    Console.WriteLine("\n=============================\n");
+                }
             }
             catch (Exception e)
             {

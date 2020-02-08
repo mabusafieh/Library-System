@@ -120,6 +120,9 @@
   <data name="chooseoutputfiletype" xml:space="preserve">
     <value>If you need the output file in JSON type 'J', otherwise the output file will be exported as a text file (Optional):</value>
   </data>
+  <data name="current_checked_out_book_count" xml:space="preserve">
+    <value>Current checked out book count = {0}</value>
+  </data>
   <data name="enterfilepath" xml:space="preserve">
     <value>Enter input file path:</value>
   </data>
@@ -128,6 +131,15 @@
   </data>
   <data name="exceptionsource" xml:space="preserve">
     <value>Exception source: {0}</value>
+  </data>
+  <data name="most_checked_out_book" xml:space="preserve">
+    <value>Most checked out book = {0}</value>
+  </data>
+  <data name="personwithmostcheckouts" xml:space="preserve">
+    <value>Person with most checkouts = {0}</value>
+  </data>
+  <data name="person_who_has_currently_most_books" xml:space="preserve">
+    <value>Person who has currently most books = {0}</value>
   </data>
   <data name="wrongentry" xml:space="preserve">
     <value>Wrong entry.</value>

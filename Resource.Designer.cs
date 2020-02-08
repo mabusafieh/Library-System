@@ -70,6 +70,15 @@ namespace Library_System {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current checked out book count = {0}.
+        /// </summary>
+        internal static string current_checked_out_book_count {
+            get {
+                return ResourceManager.GetString("current_checked_out_book_count", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enter input file path:.
         /// </summary>
         internal static string enterfilepath {
@@ -93,6 +102,33 @@ namespace Library_System {
         internal static string exceptionsource {
             get {
                 return ResourceManager.GetString("exceptionsource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Most checked out book = {0}.
+        /// </summary>
+        internal static string most_checked_out_book {
+            get {
+                return ResourceManager.GetString("most_checked_out_book", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Person who has currently most books = {0}.
+        /// </summary>
+        internal static string person_who_has_currently_most_books {
+            get {
+                return ResourceManager.GetString("person_who_has_currently_most_books", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Person with most checkouts = {0}.
+        /// </summary>
+        internal static string personwithmostcheckouts {
+            get {
+                return ResourceManager.GetString("personwithmostcheckouts", resourceCulture);
             }
         }
         
