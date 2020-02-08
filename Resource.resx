@@ -123,6 +123,12 @@
   <data name="enterfilepath" xml:space="preserve">
     <value>Enter input file path:</value>
   </data>
+  <data name="exceptionmessage" xml:space="preserve">
+    <value>Exception message: {0}</value>
+  </data>
+  <data name="exceptionsource" xml:space="preserve">
+    <value>Exception source: {0}</value>
+  </data>
   <data name="wrongentry" xml:space="preserve">
     <value>Wrong entry.</value>
   </data>

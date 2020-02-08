@@ -79,6 +79,24 @@ namespace Library_System {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exception message: {0}.
+        /// </summary>
+        internal static string exceptionmessage {
+            get {
+                return ResourceManager.GetString("exceptionmessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception source: {0}.
+        /// </summary>
+        internal static string exceptionsource {
+            get {
+                return ResourceManager.GetString("exceptionsource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wrong entry..
         /// </summary>
         internal static string wrongentry {

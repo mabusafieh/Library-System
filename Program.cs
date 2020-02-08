@@ -10,11 +10,15 @@ namespace Library_System
     {
         private static long _total = 0L;
         private static string _lastNodeAction = string.Empty;
+        private const string CHECKOUT = "check-out";
+        private const string CHECKIN = "check-in";
+        private const char FILE_SPLITTER = ',';
 
         static void Main(string[] args)
         {
             string inputFilePath;
             string outputFileType;
+            List<Record> query = new List<Record>();
 
             Console.WriteLine("\n============== Starting Program ===============\n");
 
@@ -25,14 +29,38 @@ namespace Library_System
             outputFileType = Console.ReadLine();
 
             /*------------------ reading input file ------------------*/
-            List<Record> query = ReadInputFile(inputFilePath);
+            try
+            {
+                query = ReadInputFile(inputFilePath);
+            }
+            catch (Exception e)
+            {
+                if (e.Source != null)
+                {
+                    Console.WriteLine(Resource.exceptionsource, e.Source);
+                }
+
+                //Exist Program
+                Console.WriteLine("\n============== Ending Program ===============\n");
+                System.Environment.Exit(1);
+            }
 
             /*------------------ handle statistical operations ------------------*/
             var resultJson = HandleStatisticalData(query);
 
 
             /*------------------ write output results to file ------------------*/
-            HandelOutoutFile(resultJson, outputFileType);
+            try
+            {
+                HandelOutoutFile(resultJson, outputFileType);
+            }
+            catch (Exception e)
+            {
+                if (e.Source != null)
+                {
+                    Console.WriteLine(Resource.exceptionsource, e.Source);
+                }
+            }
 
             /*------------------ write output results to console ------------------*/
             Console.WriteLine("\n=============================\n");
@@ -57,13 +85,14 @@ namespace Library_System
                                     el.Element(nameof(Record.ISBN).ToLower()).Value,
                                     (DateTimeOffset)el.Element(nameof(Record.Timestamp).ToLower()),
                                     el.Element(nameof(Record.Action).ToLower()).Attribute("type").Value)).ToList();
+
                 }
                 else if (inputFilePath.EndsWith(".csv"))
                 {
                     query = File.ReadLines(inputFilePath)
                                 .Skip(1)
-                                .Where(s => s != "")
-                                .Select(s => s.Split(new[] { ',' }))
+                                .Where(s => s != string.Empty)
+                                .Select(s => s.Split(new[] { FILE_SPLITTER }))
                                 .Select(a => new Record(a[1], a[2], DateTimeOffset.Parse(a[0]), a[3]))
                                 .ToList();
                 }
@@ -88,49 +117,82 @@ namespace Library_System
 
         public static object HandleStatisticalData(List<Record> query)
         {
+            string personWithMostCheckouts = string.Empty;
+            string mostCheckedOutBook = string.Empty;
+            string currentCheckedOutBookCount = string.Empty;
+            string personHasCurrentlyMostBooks = string.Empty;
             /*Person has the most checkouts*/
-            var personWithMostCheckouts =
+            try
+            {
+                personWithMostCheckouts =
                 (from el in query
-                 where el.Action == "check-out"
+                 where el.Action == CHECKOUT
                  group el by el.Person into g1
                  orderby g1.Count() descending
                  select g1.Key).First();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(Resource.exceptionmessage, e.Message);
+            }
+
 
             /*Which book was checked out the longest time in total*/
-            var groupByBook =
-                from el in query
-                group el by el.ISBN into g2
-                select new
-                {
-                    key = g2.Key,
-                    book_checkout_time = g2.Aggregate(0L, func: SumUpCheckoutTime, GetCheckoutTotalTime)
-                };
+            try
+            {
+                var groupByBook =
+                    from el in query
+                    group el by el.ISBN into g2
+                    select new
+                    {
+                        key = g2.Key,
+                        book_checkout_time = g2.Aggregate(0L, func: SumUpCheckoutTime, GetCheckoutTotalTime)
+                    };
 
-            var mostCheckedOutBook =
-                (from elm in groupByBook
-                 orderby elm.book_checkout_time descending
-                 select elm.key).First();
+                mostCheckedOutBook =
+                    (from elm in groupByBook
+                     orderby elm.book_checkout_time descending
+                     select elm.key).First();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(Resource.exceptionmessage, e.Message);
+            }
 
             /*How many books are checked out at this moment */
-            var currentCheckedOutBookCount =
-                (from el in query
-                 select el).Aggregate(0,
-                    (current, next) =>
-                        next.Action == "check-in" ? current - 1 : current + 1,
-                    res => res);
+            try
+            {
+                currentCheckedOutBookCount =
+                    (from el in query
+                     select el).Aggregate(0,
+                        (current, next) =>
+                            next.Action == CHECKIN ? current - 1 : current + 1,
+                        res => res).ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(Resource.exceptionmessage, e.Message);
+            }
 
             /*Who currently has the largest number of books */
-            var personHasCurrentlyMostBooks =
-                ((from el in query
-                  group el by el.Person into g2
-                  select new
-                  {
-                      key = g2.Key,
-                      book_count = g2.Aggregate(0,
-                      (longest, next) =>
-                          next.Action == "check-in" ? longest - 1 : longest + 1,
-                      res => res)
-                  }).OrderByDescending(order => order.book_count)).First().key;
+            try
+            {
+                personHasCurrentlyMostBooks =
+                    ((from el in query
+                      group el by el.Person into g2
+                      select new
+                      {
+                          key = g2.Key,
+                          book_count = g2.Aggregate(0,
+                          (longest, next) =>
+                              next.Action == CHECKIN ? longest - 1 : longest + 1,
+                          res => res)
+                      }).OrderByDescending(order => order.book_count)).First().key;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(Resource.exceptionmessage, e.Message);
+            }
 
             /*Write to result obj*/
             var resultJson = new
@@ -165,7 +227,7 @@ namespace Library_System
             long result = next.Ticks;
             _lastNodeAction = next.Action;
 
-            if (next.Action == "check-in")
+            if (next.Action == CHECKIN)
             {
                 result = next.Ticks - current;
                 _total += result;
@@ -178,7 +240,7 @@ namespace Library_System
         {
             long temp = _total;
 
-            if (_lastNodeAction == "check-out")
+            if (_lastNodeAction == CHECKOUT)
             {
                 temp = DateTime.Now.Ticks - result;
                 temp += _total;
