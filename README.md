@@ -28,6 +28,19 @@ If you need the output file in JSON type 'J', otherwise the output file will be 
 
 3. the output file will be placed in the current directory.
 
+Sample JSON file:
+```
+{ person_with_most_checkouts = 2, most_checked_out_book = 99-9263-544-4, current_checked_out_book_count = 1, person_who_has_currently_most_books = 3 }
+```
+
+Sample text file:
+```
+Person with most checkouts = 2
+Most checked out book = 99-9263-544-4
+Current checked out book count = 1
+Person who has currently most books = 3
+```
+
 ## Acknowledgments
 
 * Hat tip to anyone whose code was used
