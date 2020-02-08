@@ -1,6 +1,6 @@
-# Book Analytic System
+# Library System
 
-Book Analytic System is a .Net core console application that is responsible for make auditing on a log of transactions file.
+Libray System is a .Net core console application that is responsible for make auditing on a log of transactions file.
 
 ## Getting Started
 
@@ -8,27 +8,25 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Run Visual Studio as administration.
+Run Visual Studio as Administration.
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
+When the app is running, do the following:
 
-### Break down into end to end tests
-
-Explain what these tests test and why
+1. enter full file path. example:
 
 ```
-Give an example
+Enter input file path:C:/2017-01.xml
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
+2. type 'J', if you need the output file as JSON file. click enter if you need it as text file:
 
 ```
-Give an example
+If you need the output file in JSON type 'J', otherwise the output file will be exported as a text file (Optional):
 ```
+
+3. the output file will be placed in the current directory.
 
 ## Acknowledgments
 
